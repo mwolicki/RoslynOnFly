@@ -5,30 +5,30 @@ module CsProject =
     open FSharp.Data
 
     type ProjectXml = XmlProvider<"projectExample2.xml">
-
+    type Path = string
 
     type Reference =
-        | RefFile of path: string
-        | RefProject of path: string
+        | RefFile of Path
+        | RefProject of Path
 
     type ProjectFile = 
-        | CsFile of path: string
-        | EmbeddedRes of path: string
+        | CsFile of Path
+        | EmbeddedRes of Path
 
     type Project = {name: string; references: seq<Reference>; files: seq<ProjectFile>}
 
 
-    let getProject (filePath: string) =
-        let proj = (ProjectXml.Load filePath)
+    let getProject (filePath: Path) =
+        let proj = ProjectXml.Load filePath
 
         let refs = proj.ItemGroups |> Seq.collect (fun p->seq{
-            for i in p.ProjectReferences -> RefProject(i.Include)
-            for i in p.References -> RefFile(i.Include)
+            for reference in p.ProjectReferences -> RefProject reference.Include
+            for reference in p.References -> RefFile reference.Include
         })
     
         let files = proj.ItemGroups |> Seq.collect (fun p->seq{
-            for i in p.Compiles -> CsFile(i.Include)
-            for i in p.EmbeddedResources -> EmbeddedRes(i.Include)
+            for file in p.Compiles -> CsFile(file.Include)
+            for file in p.EmbeddedResources -> EmbeddedRes(file.Include)
         })
 
         let n=(proj.PropertyGroups |> Seq.find (fun x-> x.AssemblyName.IsSome )).AssemblyName.Value
