@@ -2,20 +2,25 @@
 open FSharp.Data
 
 type ProjectXml = XmlProvider<"projectExample2.xml">
-type Path = string
+type FilePath = string
 
 type Reference =
-    | RefFile of Path
-    | RefProject of Path
+    | RefFile of FilePath
+    | RefProject of FilePath
 
 type ProjectFile = 
-    | CsFile of Path
-    | EmbeddedRes of Path
+    | CsFile of FilePath
+    | EmbeddedRes of FilePath
 
-type Project = {name: string; references: seq<Reference>; files: seq<ProjectFile>}
+type Project = {
+        Name: string;
+        References: seq<Reference>;
+        Files: seq<ProjectFile>;
+        OutputFile: FilePath
+    }
 
 
-let getProject (filePath: Path) =
+let getProject (filePath: FilePath) =
     let proj = ProjectXml.Load filePath
 
     let refs = proj.ItemGroups |> Seq.collect (fun p->seq{
@@ -32,4 +37,4 @@ let getProject (filePath: Path) =
         match (proj.PropertyGroups |> Seq.find (fun x-> x.AssemblyName.IsSome)).AssemblyName with
         | Some n -> n
         | None -> filePath
-    {name = assemblyName; references = refs; files = files}
+    { Name = assemblyName; References = refs; Files = files; OutputFile = assemblyName }

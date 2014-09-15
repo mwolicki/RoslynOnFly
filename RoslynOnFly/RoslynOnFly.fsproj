@@ -80,6 +80,7 @@
     <None Include="packages.config" />
     <Compile Include="CsProject.fs" />
     <Content Include="projectExample2.xml" />
+    <Compile Include="Compile.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <PropertyGroup>
