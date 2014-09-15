@@ -28,5 +28,8 @@ let getProject (filePath: Path) =
         for file in p.EmbeddedResources -> EmbeddedRes(file.Include)
     })
 
-    let n=(proj.PropertyGroups |> Seq.find (fun x-> x.AssemblyName.IsSome )).AssemblyName.Value
-    {name = n; references = refs; files = files}
+    let assemblyName=
+        match (proj.PropertyGroups |> Seq.find (fun x-> x.AssemblyName.IsSome)).AssemblyName with
+        | Some n -> n
+        | None -> filePath
+    {name = assemblyName; references = refs; files = files}
