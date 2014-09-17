@@ -1,6 +1,8 @@
-﻿
+﻿open CsProject
+open Compile
 
 [<EntryPoint>]
 let main argv = 
-    printfn "%A" argv
-    0 // return an integer exit code
+    let compiledProject = getProject argv.[0] |> compileProject
+    printfn "%A" compiledProject.Success
+    0

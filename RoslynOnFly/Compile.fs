@@ -14,5 +14,6 @@ let compileProject (project : Project) =
                 | CsFile file -> yield getSyntaxTree file
                 | _ -> ()
             ])
+    
     let cmp = CSharpCompilation.Create (project.Name, sourceCode)
     cmp.Emit project.OutputFile
