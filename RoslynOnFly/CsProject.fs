@@ -5,6 +5,10 @@ open System.IO
 type ProjectXml = XmlProvider<"projectExample2.xml">
 type FilePath = string
 
+type OutputType =
+    | WinExe
+    | Dll
+
 type Reference =
     | RefFile of FilePath
     | RefProject of FilePath
@@ -17,7 +21,8 @@ type Project = {
         Name: string;
         References: seq<Reference>;
         Files: seq<ProjectFile>;
-        OutputFile: FilePath
+        OutputFile: FilePath;
+        OutputType: OutputType
     }
 
 let getProject (filePath: FilePath) =
@@ -40,15 +45,12 @@ let getProject (filePath: FilePath) =
         | Some n when n.IsSome -> n.Value
         | _ -> Path.GetFileName filePath
 
-    let getExt (outputType) = 
-        match outputType with
-        | Some (Some "WinExe") -> ".exe"
-        | _ -> ".dll"
-
-    let getOutputFile outputType = assemblyName + getExt outputType
-
-    let outputFile= proj.PropertyGroups |> Seq.map (fun x->x.OutputType) |> Seq.tryFind (fun x-> x.IsSome) |> getOutputFile
+    let getOutputType = function Some(Some "WinExe") -> WinExe | _ -> Dll
+    let getExt = function WinExe -> ".exe" | Dll -> ".dll"
     
+    let getOutputFile outputType = assemblyName + getExt outputType
+    let outputType = proj.PropertyGroups |> Seq.map (fun x->x.OutputType) |> Seq.tryFind (fun x-> x.IsSome) |> getOutputType
+    let outputFile = getOutputFile outputType
 
-    { Name = assemblyName; References = refs; Files = files; OutputFile = outputFile }
+    { Name = assemblyName; References = refs; Files = files; OutputFile = outputFile; OutputType = outputType }
 
